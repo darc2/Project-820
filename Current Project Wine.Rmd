@@ -1,0 +1,412 @@
+---
+title: "Project Wine 820"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+R.version.string
+#> [1] "R version 4.1.1 (2021-08-10)"
+```
+
+
+```{r}
+# update.packages(ask = FALSE, checkBuilt = TRUE)
+```
+```{r}
+R.version.string
+#> [1] "R version 4.1.1 (2021-08-10)"
+```
+
+R.version.string
+#> [1] "R version 4.1.1 (2021-08-10)"
+
+###
+
+Data exploration goes here
+
+head
+str
+anything else?
+
+
+```{r}
+
+###  Load white wine dataset
+wine <- read.csv("winequality-white.csv", header = T , stringsAsFactors = F, sep = ";", na.strings = c("","NA"))
+# had to use sep = ";" since csv is not comma separated
+head(wine)
+```
+
+```{r}
+str(wine)
+```
+
+
+### 
+
+Add code here to show histograms
+
+" A histogram is the appropriate graph for the initial exploration of a continuous variable.  By means of a set of vertical bars, it shows how the numerical values of that variable are distributed.  The histogram allows to calculate the probability of representation of any value value of the continuous variable under study, which is great importance if we want to make inferences and estimate population values from the results of our sample.
+
+A histogram provides a visual representation of the distribution of a dataset: location, spread and skewness of data; it also helps to visualize whether the distribution is symmetric or skewed left or right.  In addition, if it is unimodal, bimodal or multimodal.  It can also show any outliers or gaps in the data.  In brief, a histogram summarizes the distribution properties of a continuous numerical variable. (Towards Data Science) "
+
+from: www.towardsdatascience.com/histograms-why-how-431a5cfbfcd5 
+
+
+
+```{r}
+hist(wine$quality)
+```
+
+```{r}
+hist(wine$fixed.acidity)
+```
+
+```{r}
+hist(wine$volatile.acidity)
+```
+
+```{r}
+hist(wine$citric.acid)
+```
+
+```{r}
+hist(wine$residual.sugar)
+```
+
+```{r}
+hist(wine$chlorides)
+```
+
+```{r}
+hist(wine$free.sulfur.dioxide)
+```
+
+```{r}
+hist(wine$total.sulfur.dioxide)
+```
+
+```{r}
+hist(wine$density)
+```
+
+```{r}
+hist(wine$pH)
+```
+
+```{r}
+hist(wine$sulphates)
+```
+
+```{r}
+hist(wine$alcohol)
+```
+
+
+```{r}
+plot(wine)
+```
+
+```{r}
+
+### Selected features that most people would recognize
+
+subset_wine_W <- wine[,c("fixed.acidity","residual.sugar","density", "pH", "sulphates", "alcohol", "quality")]
+print(head(subset_wine_W))
+```
+
+```{r}
+plot(subset_wine_W)
+```
+
+### 
+
+Show correlation
+
+
+```{r}
+install.packages("corrplot")
+library(corrplot)
+```
+
+```{r}
+wine.cor <- cor(wine, method = "pearson")
+```
+
+```{r}
+corrplot(wine.cor)
+```
+
+### include comments in the report... 
+- We can see that alcohol is negatively correlated to density and that density is positively correlated to residual sugars.
+- We also see that quality is positively correlated to alcohol.
+- what other conclusions about correlation can we include?
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+#####################################################
+
+#Turn quality field into factor
+wine$quality <- as.factor(wine$quality)
+```
+
+
+```{r}
+#############################################################################################
+
+# knn starts below
+
+#df <- data(iris) ##load data
+ #head(iris) ## see the studcture
+
+ 
+```
+
+
+```{r}
+##Generate a random number that is 90% of the total number of rows in dataset.
+ #ran <- sample(1:nrow(iris), 0.9 * nrow(iris)) 
+
+wine_ran <- sample(1:nrow(wine), 0.9 * nrow(wine))
+ 
+ ##the normalization function is created
+ nor <-function(x) { (x -min(x))/(max(x)-min(x))   }
+ 
+```
+
+
+```{r}
+##Run nomalization on first 4 coulumns of dataset because they are the predictors
+ #iris_norm <- as.data.frame(lapply(iris[,c(1,2,3,4)], nor))
+
+##Run nomalization on first 11 columns of dataset because they are the predictors
+wine_knn_norm <- as.data.frame(lapply(wine[,c(1,2,3,4,5,6,7,8,9,10,11)], nor))
+ 
+ summary(wine_knn_norm)
+```
+
+
+```{r}
+##extract training set
+#iris_train <- iris_norm[ran,]
+
+wine_knn_train <- wine_knn_norm[wine_ran,]
+```
+
+
+```{r}
+head(wine_knn_train)
+```
+
+
+```{r}
+##extract testing set
+ #iris_test <- iris_norm[-ran,]
+
+wine_knn_test <- wine_knn_norm[-wine_ran,]
+```
+
+
+```{r}
+##extract 5th column of train dataset because it will be used as 'cl' argument in knn function.
+
+#iris_target_category <- iris[ran,5]
+
+wine_knn_target_category <- wine[wine_ran, 12]
+```
+
+
+```{r}
+##extract 5th column of test dataset to measure the accuracy
+ #iris_test_category <- iris[-ran,5]
+
+wine_knn_test_category <- wine[-wine_ran, 12]
+```
+
+
+```{r}
+##load the package class
+ library(class)
+```
+
+
+```{r}
+##run knn function
+ #pr <- knn(iris_train,iris_test,cl=iris_target_category,k=13)
+
+wine_knn_model <- knn(wine_knn_train, wine_knn_test, cl=wine_knn_target_category, k=13 )
+```
+
+
+```{r}
+##create confusion matrix
+ #tab <- table(pr,iris_test_category)
+
+wine_knn_Conf_Matrix <- table(wine_knn_model,wine_knn_test_category)
+```
+
+
+```{r}
+##this function divides the correct predictions by total number of predictions that tell us how accurate the model is.
+ 
+ accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+ #accuracy(tab)
+ accuracy(wine_knn_Conf_Matrix)
+## [1] 80
+
+```
+
+
+
+
+```{r}
+
+############################################################################################
+
+# Random Forest starts below
+
+
+library(randomForest)
+library(ggplot2) # Data visualization
+# library(readr) # CSV file I/O, e.g. the read_csv function
+```
+
+```{r}
+###
+
+#Create random forest model with 1000 trees and 7 random variables
+
+model <- randomForest(quality ~ ., data = wine, importance=TRUE, proximity=TRUE, ntree=1000, mtry=7)
+
+model
+
+```
+
+
+```{r}
+
+#Check out importance variables so as to get rid some of them
+varImpPlot(model)
+
+```
+
+
+
+
+```{r}
+### Why normalize?  
+
+#Normalize data between 0 and 1
+norm <- function(x) {(x - min(x, na.rm=TRUE))/(max(x,na.rm=TRUE) -
+min(x, na.rm=TRUE))}
+wine$fixed.acidity <- norm(wine$fixed.acidity)
+wine$volatile.acidity <- norm(wine$volatile.acidity)
+wine$citric.acid <- norm(wine$citric.acid)
+wine$residual.sugar <- norm(wine$residual.sugar)
+wine$chlorides <- norm(wine$chlorides)
+wine$free.sulfur.dioxide <- norm(wine$free.sulfur.dioxide)
+wine$total.sulfur.dioxide <- norm(wine$total.sulfur.dioxide)
+wine$density <- norm(wine$density)
+wine$pH <- norm(wine$pH)
+wine$sulphates <- norm(wine$sulphates)
+wine$alcohol <- norm(wine$alcohol)
+
+```
+
+
+
+```{r}
+##############################################################################
+
+# NN starts here
+# solving classification problems with neuralnet
+# https://datascienceplus.com/neuralnet-train-and-test-neural-networks-using-r/
+
+#Neural Network
+install.packages(neuralnet)
+library(neuralnet)
+
+#nn <- neuralnet(dividend ~ fcfps + earnings_growth + de + mcap + current_ratio, data=trainset, hidden=c(2,1), linear.output=FALSE, threshold=0.01)
+```
+```{r}
+# Training and Test Data
+
+wine_nn_norm <- as.data.frame(lapply(wine[,c(1,2,3,4,5,6,7,8,9,10,11,12)], nor))
+ 
+#trainset <- maxmindf[1:160, ]
+#testset <- maxmindf[161:200, ]
+
+#wine_knn_train <- wine_knn_norm[wine_ran,]
+wine_nn_train <- wine_nn_norm[wine_ran,]
+
+##extract testing set
+ #iris_test <- iris_norm[-ran,]
+
+#wine_knn_test <- wine_knn_norm[-wine_ran,]
+wine_nn_test <- wine_nn_norm[-wine_ran,]
+```
+
+
+```{r}
+wine_nn <- neuralnet(quality ~ fixed.acidity+ volatile.acidity + citric.acid + residual.sugar + chlorides + free.sulfur.dioxide + total.sulfur.dioxide + density + pH + sulphates + alcohol, data = wine_nn_train, hidden=c(2,1), linear.output=FALSE, threshold=0.01)
+
+
+#nn$result.matrix
+
+wine_nn$result.matrix
+
+#plot(nn)
+plot(wine_nn)
+```
+
+```{r}
+#Test the resulting output
+#temp_test <- subset(testset, select = c("fcfps","earnings_growth", "de", "mcap", "current_ratio"))
+#head(temp_test)
+#nn.results <- compute(nn, temp_test)
+#results <- data.frame(actual = testset$dividend, prediction = nn.results$net.result)
+```
+
+```{r}
+#roundedresults<-sapply(results,round,digits=0)
+#roundedresultsdf=data.frame(roundedresults)
+#attach(roundedresultsdf)
+#table(actual,prediction)
+```
+
