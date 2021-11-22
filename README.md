@@ -1,3 +1,7 @@
 # Project-820
 
-Checking to see if R Studio is connected.
+Place flowchart here for proposed methodology.
+
+![](images/Flowchart%20Project%20820.pdf "Methodology Flowchart")
+
+![](images/Flowchart%20Project%20820.odt)
